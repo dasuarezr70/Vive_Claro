@@ -1,599 +1,132 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bosquejo — Gestión de Compras</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  body { margin: 0; }
-</style>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EcoChallenge</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 </head>
+
 <body>
-<div id="root"></div>
 
-<script type="text/babel">
-const { useState } = React;
+<header>
 
-const NAVY = "#1A1A1A";
-const GOLD = "#C41E3A";
+    <div class="logo">
 
-/* --- Iconos SVG livianos (sin dependencias externas) --- */
-const Icon = ({ d, size = 16, color = "currentColor", strokeWidth = 2, children }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
-       strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-    {d && <path d={d} />}
-    {children}
-  </svg>
-);
-const FileText = (p) => <Icon {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></Icon>;
-const Shuffle = (p) => <Icon {...p}><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.4c1.3 0 2.5.6 3.3 1.7l6.1 8.6c.8 1.1 2 1.7 3.3 1.7H22"/><path d="m18 14 4 4-4 4"/></Icon>;
-const Columns = (p) => <Icon {...p}><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/></Icon>;
-const Bell = (p) => <Icon {...p}><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></Icon>;
-const BarChart2 = (p) => <Icon {...p}><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></Icon>;
-const Truck = (p) => <Icon {...p}><path d="M14 18V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.63l-2.45-3.06A1 1 0 0 0 18.55 9H14"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></Icon>;
-const Settings = (p) => <Icon {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></Icon>;
-const Search = (p) => <Icon {...p}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></Icon>;
-const Plus = (p) => <Icon {...p}><path d="M5 12h14"/><path d="M12 5v14"/></Icon>;
-const Clock = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></Icon>;
-const CheckCircle2 = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></Icon>;
-const TrendingUp = (p) => <Icon {...p}><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></Icon>;
-const Star = (p) => <Icon {...p}><path d="M12 2 15.09 8.26 22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></Icon>;
-const Users = (p) => <Icon {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></Icon>;
-const Paperclip = (p) => <Icon {...p}><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></Icon>;
-const Database = (p) => <Icon {...p}><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></Icon>;
-const AlertTriangle = (p) => <Icon {...p}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></Icon>;
+        🌱 EcoChallenge
 
-const NAV_ITEMS = [
-  { key: "registro", label: "Registro de Solicitudes", icon: FileText },
-  { key: "clasificacion", label: "Clasificación y Asignación", icon: Shuffle },
-  { key: "tablero", label: "Tablero de Seguimiento", icon: Columns },
-  { key: "notificaciones", label: "Notificaciones", icon: Bell },
-  { key: "indicadores", label: "Indicadores y Reportes", icon: BarChart2 },
-  { key: "proveedores", label: "Proveedores", icon: Truck },
-  { key: "administracion", label: "Administración", icon: Settings },
-];
-
-const URGENCIA_STYLES = {
-  Alta: { bg: "#FBE7E4", fg: "#B5432E" },
-  Media: { bg: "#FBF1DC", fg: "#8A6A1E" },
-  Baja: { bg: "#E4EFE7", fg: "#3D6B4A" },
-};
-
-const COLUMNS = [
-  { name: "Recibido", cards: [
-    { id: "SC-2026-0148", item: "Resmas de papel A4", area: "Administrativa", urgencia: "Baja" },
-    { id: "SC-2026-0149", item: "Repuesto compresor línea 2", area: "Mantenimiento", urgencia: "Alta" },
-  ]},
-  { name: "Clasificado", cards: [
-    { id: "SC-2026-0145", item: "EPP guantes nitrilo", area: "Producción", urgencia: "Media" },
-  ]},
-  { name: "Asignado", cards: [
-    { id: "SC-2026-0141", item: "Servicio mantenimiento HVAC", area: "Operaciones", urgencia: "Media", resp: "J.R." },
-    { id: "SC-2026-0143", item: "Licencias software diseño", area: "Comercial", urgencia: "Baja", resp: "M.T." },
-  ]},
-  { name: "En proceso", cards: [
-    { id: "SC-2026-0138", item: "Materia prima resina", area: "Producción", urgencia: "Alta", resp: "A.P." },
-  ]},
-  { name: "Aprobado", cards: [
-    { id: "SC-2026-0130", item: "Uniformes de dotación", area: "RRHH", urgencia: "Baja", resp: "L.G." },
-    { id: "SC-2026-0132", item: "Sensores de línea", area: "Mantenimiento", urgencia: "Media", resp: "J.R." },
-  ]},
-  { name: "Cerrado", cards: [
-    { id: "SC-2026-0121", item: "Kit señalización seguridad", area: "Sostenibilidad", urgencia: "Baja", resp: "L.G." },
-  ]},
-];
-
-const KPIS = [
-  { label: "Tiempo promedio de asignación", value: "4.1 h", icon: Clock, note: "Meta ≤ 4 h" },
-  { label: "Solicitudes registradas (mes)", value: "128", icon: FileText, note: "+12 vs. mes anterior" },
-  { label: "Nivel de servicio", value: "92 %", icon: TrendingUp, note: "Meta ≥ 90 %" },
-  { label: "Trazabilidad completa", value: "100 %", icon: CheckCircle2, note: "Meta 100 %" },
-];
-
-/* ---------- Tarjeta de solicitud (Tablero) ---------- */
-function RequestCard({ card }) {
-  const style = URGENCIA_STYLES[card.urgencia];
-  return (
-    <div className="relative bg-white rounded-lg border border-slate-200 shadow-sm p-3 mb-3 last:mb-0">
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="font-mono text-[11px] tracking-tight text-slate-400">{card.id}</span>
-        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-              style={{ backgroundColor: style.bg, color: style.fg }}>
-          {card.urgencia}
-        </span>
-      </div>
-      <p className="text-sm font-semibold text-slate-800 leading-snug mb-1">{card.item}</p>
-      <div className="flex items-center justify-between mt-2">
-        <span className="text-[11px] text-slate-400">{card.area}</span>
-        {card.resp && (
-          <span className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                style={{ backgroundColor: NAVY }}>
-            {card.resp}
-          </span>
-        )}
-      </div>
-      <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-slate-100 border border-slate-200" />
-      <div className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-slate-100 border border-slate-200" />
     </div>
-  );
-}
 
-function SectionCard({ children, className = "" }) {
-  return <div className={`bg-white rounded-xl border border-slate-200 p-5 ${className}`}>{children}</div>;
-}
+    <nav>
 
-/* ---------- 1. Vista: Tablero ---------- */
-function TableroView() {
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-      {COLUMNS.map((col) => (
-        <div key={col.name} className="bg-slate-100/70 rounded-xl p-2.5 min-w-0">
-          <div className="flex items-center justify-between px-1 mb-2">
-            <span className="text-[12px] font-bold text-slate-600">{col.name}</span>
-            <span className="text-[11px] text-slate-400 bg-white rounded-full w-5 h-5 flex items-center justify-center">
-              {col.cards.length}
-            </span>
-          </div>
-          {col.cards.map((card) => <RequestCard key={card.id} card={card} />)}
-        </div>
-      ))}
-    </div>
-  );
-}
+        <a href="#">Inicio</a>
 
-/* ---------- 2. Vista: Registro de Solicitudes ---------- */
-function RegistroView() {
-  const [urgencia, setUrgencia] = useState("Alta");
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      <SectionCard className="lg:col-span-2">
-        <h3 className="text-sm font-bold text-slate-700 mb-4">Nueva Solicitud de Compra</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <label className="flex flex-col gap-1 col-span-1">
-            <span className="text-[12px] font-medium text-slate-500">Área solicitante</span>
-            <select disabled className="border border-slate-200 rounded-lg px-3 py-2 text-[13px] bg-slate-50 text-slate-600">
-              <option>Mantenimiento</option>
-            </select>
-          </label>
-          <label className="flex flex-col gap-1 col-span-1">
-            <span className="text-[12px] font-medium text-slate-500">Fecha requerida</span>
-            <input disabled value="28 / 07 / 2026" className="border border-slate-200 rounded-lg px-3 py-2 text-[13px] bg-slate-50 text-slate-600" />
-          </label>
-          <label className="flex flex-col gap-1 col-span-2">
-            <span className="text-[12px] font-medium text-slate-500">Ítem o servicio requerido</span>
-            <input disabled value="Repuesto compresor línea 2" className="border border-slate-200 rounded-lg px-3 py-2 text-[13px] bg-slate-50 text-slate-600" />
-          </label>
-          <label className="flex flex-col gap-1 col-span-1">
-            <span className="text-[12px] font-medium text-slate-500">Cantidad</span>
-            <input disabled value="2" className="border border-slate-200 rounded-lg px-3 py-2 text-[13px] bg-slate-50 text-slate-600" />
-          </label>
-          <label className="flex flex-col gap-1 col-span-1">
-            <span className="text-[12px] font-medium text-slate-500">Unidad</span>
-            <input disabled value="Unidades" className="border border-slate-200 rounded-lg px-3 py-2 text-[13px] bg-slate-50 text-slate-600" />
-          </label>
-          <label className="flex flex-col gap-1 col-span-2">
-            <span className="text-[12px] font-medium text-slate-500">Justificación</span>
-            <textarea disabled rows={3} value="La línea 2 presenta vibración anómala; el compresor actual está fuera de garantía y el repuesto es indispensable para evitar parada de producción."
-              className="border border-slate-200 rounded-lg px-3 py-2 text-[13px] bg-slate-50 text-slate-600 resize-none" />
-          </label>
-          <div className="flex flex-col gap-1 col-span-2">
-            <span className="text-[12px] font-medium text-slate-500">Nivel de urgencia</span>
-            <div className="flex gap-2">
-              {["Alta", "Media", "Baja"].map((u) => (
-                <button key={u} onClick={() => setUrgencia(u)}
-                  className="px-3 py-1.5 rounded-full text-[12px] font-semibold border"
-                  style={ urgencia === u
-                    ? { backgroundColor: URGENCIA_STYLES[u].bg, color: URGENCIA_STYLES[u].fg, borderColor: URGENCIA_STYLES[u].fg }
-                    : { backgroundColor: "white", color: "#94a3b8", borderColor: "#e2e8f0" } }>
-                  {u}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="col-span-2 border-2 border-dashed border-slate-200 rounded-lg py-6 flex flex-col items-center gap-1.5 text-slate-400">
-            <Paperclip size={18} />
-            <span className="text-[12px]">Adjuntar cotización o soporte (opcional)</span>
-          </div>
-        </div>
-        <button className="mt-5 flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-semibold text-white" style={{ backgroundColor: NAVY }}>
-          Enviar solicitud
+        <a href="#">Retos</a>
+
+        <a href="#">Ranking</a>
+
+        <a href="#">Perfil</a>
+
+    </nav>
+
+</header>
+
+<section class="hero">
+
+    <div class="hero-text">
+
+        <h1>Convierte tus hábitos en grandes logros</h1>
+
+        <p>
+
+            Completa desafíos ecológicos, gana puntos,
+
+            desbloquea insignias y ayuda al planeta mientras te diviertes.
+
+        </p>
+
+        <button id="btnComenzar">
+
+            Comenzar Aventura
+
         </button>
-      </SectionCard>
 
-      <SectionCard>
-        <h3 className="text-sm font-bold text-slate-700 mb-3">Vista previa del registro</h3>
-        <div className="border border-slate-200 rounded-lg p-3 mb-4">
-          <p className="font-mono text-[11px] text-slate-400 mb-1">N° consecutivo asignado</p>
-          <p className="text-lg font-bold" style={{ color: NAVY }}>SC-2026-0150</p>
-        </div>
-        <p className="text-[12px] font-semibold text-slate-500 mb-2">Validación automática</p>
-        <ul className="space-y-2">
-          {["Campos obligatorios completos", "Justificación registrada", "Área solicitante identificada", "Número consecutivo generado"].map((t) => (
-            <li key={t} className="flex items-center gap-2 text-[12px] text-slate-600">
-              <CheckCircle2 size={14} color="#4F8B62" /> {t}
-            </li>
-          ))}
-        </ul>
-      </SectionCard>
     </div>
-  );
-}
 
-/* ---------- 3. Vista: Clasificación y Asignación ---------- */
-function ClasificacionView() {
-  const criterios = [
-    { label: "Impacto operativo", nivel: "Alto", pct: 85 },
-    { label: "Urgencia", nivel: "Alto", pct: 90 },
-    { label: "Criticidad del bien", nivel: "Medio", pct: 60 },
-    { label: "Complejidad de adquisición", nivel: "Bajo", pct: 30 },
-  ];
-  const historial = [
-    { id: "SC-2026-0149", item: "Repuesto compresor línea 2", prioridad: "Alta", resp: "J.R." },
-    { id: "SC-2026-0145", item: "EPP guantes nitrilo", prioridad: "Media", resp: "M.T." },
-    { id: "SC-2026-0143", item: "Licencias software diseño", prioridad: "Baja", resp: "M.T." },
-  ];
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      <SectionCard className="lg:col-span-2">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-slate-700">Clasificando: SC-2026-0149 — Repuesto compresor línea 2</h3>
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: URGENCIA_STYLES.Alta.bg, color: URGENCIA_STYLES.Alta.fg }}>
-            Prioridad resultante: ALTA
-          </span>
-        </div>
-        <div className="space-y-4">
-          {criterios.map((c) => (
-            <div key={c.label}>
-              <div className="flex justify-between text-[12px] mb-1">
-                <span className="font-medium text-slate-600">{c.label}</span>
-                <span className="text-slate-400">{c.nivel}</span>
-              </div>
-              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: `${c.pct}%`, backgroundColor: GOLD }} />
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-5 flex items-center gap-3 bg-slate-50 rounded-lg p-3">
-          <span className="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold text-white" style={{ backgroundColor: NAVY }}>J.R.</span>
-          <div>
-            <p className="text-[13px] font-semibold text-slate-700">Asignado automáticamente a Juan Ramírez</p>
-            <p className="text-[11px] text-slate-400">Equipo de Compras — Categoría Mantenimiento</p>
-          </div>
-        </div>
-      </SectionCard>
+    <div class="hero-image">
 
-      <SectionCard>
-        <h3 className="text-sm font-bold text-slate-700 mb-3">Últimas clasificaciones</h3>
-        <div className="space-y-3">
-          {historial.map((h) => (
-            <div key={h.id} className="flex items-center justify-between border-b border-slate-100 pb-2 last:border-0">
-              <div>
-                <p className="font-mono text-[10px] text-slate-400">{h.id}</p>
-                <p className="text-[12px] font-medium text-slate-700">{h.item}</p>
-              </div>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: URGENCIA_STYLES[h.prioridad].bg, color: URGENCIA_STYLES[h.prioridad].fg }}>
-                {h.prioridad}
-              </span>
-            </div>
-          ))}
-        </div>
-      </SectionCard>
+        🌎
+
     </div>
-  );
-}
 
-/* ---------- 4. Vista: Notificaciones ---------- */
-function NotificacionesView() {
-  const notifs = [
-    { color: "#1E3A5F", title: "Nueva solicitud asignada", desc: "SC-2026-0149 fue asignada a Juan Ramírez (Mantenimiento).", time: "Hace 5 min" },
-    { color: "#C9A24B", title: "Aprobación pendiente", desc: "SC-2026-0138 requiere aprobación de Gerencia antes de continuar.", time: "Hace 1 h" },
-    { color: "#B5432E", title: "Solicitud devuelta", desc: "SC-2026-0142 fue devuelta al solicitante por información incompleta.", time: "Hace 3 h" },
-    { color: "#C9503A", title: "Indicador en riesgo", desc: "Tiempo promedio de asignación superó la meta (≤ 4 h) esta semana.", time: "Hace 1 día" },
-    { color: "#4F8B62", title: "Solicitud cerrada", desc: "SC-2026-0121 fue marcada como cerrada y entregada.", time: "Hace 2 días" },
-  ];
-  return (
-    <SectionCard>
-      <h3 className="text-sm font-bold text-slate-700 mb-4">Centro de notificaciones</h3>
-      <div className="space-y-3">
-        {notifs.map((n, i) => (
-          <div key={i} className="flex items-start gap-3 border-l-4 rounded-r-lg bg-slate-50 p-3" style={{ borderColor: n.color }}>
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <p className="text-[13px] font-semibold text-slate-700">{n.title}</p>
-                <span className="text-[11px] text-slate-400">{n.time}</span>
-              </div>
-              <p className="text-[12px] text-slate-500 mt-0.5">{n.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </SectionCard>
-  );
-}
+</section>
 
-/* ---------- 5. Vista: Indicadores y Reportes ---------- */
-function IndicadoresView() {
-  const meses = [
-    { m: "Feb", v: 40 }, { m: "Mar", v: 55 }, { m: "Abr", v: 48 },
-    { m: "May", v: 70 }, { m: "Jun", v: 85 }, { m: "Jul", v: 100 },
-  ];
-  const tabla = [
-    { nivel: "Estratégico", ind: "Nivel de satisfacción del cliente interno", meta: "≥ 90 %", frec: "Trimestral" },
-    { nivel: "Estratégico", ind: "% de solicitudes registradas en el aplicativo", meta: "100 %", frec: "Mensual" },
-    { nivel: "Táctico–Operativo", ind: "Tiempo promedio de asignación", meta: "≤ 4 h", frec: "Semanal" },
-    { nivel: "Táctico", ind: "Solicitudes con trazabilidad completa", meta: "100 %", frec: "Mensual" },
-    { nivel: "Operativo", ind: "Devueltas por información incompleta", meta: "≤ 5 %", frec: "Mensual" },
-    { nivel: "Operativo", ind: "Efectividad de validación automática", meta: "≤ 10 %", frec: "Mensual" },
-  ];
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      <SectionCard className="lg:col-span-2">
-        <h3 className="text-sm font-bold text-slate-700 mb-4">Solicitudes registradas por mes</h3>
-        <div className="flex items-end gap-4 h-40">
-          {meses.map((d) => (
-            <div key={d.m} className="flex-1 flex flex-col items-center justify-end h-full">
-              <div className="w-full rounded-t-md" style={{ height: `${d.v}%`, backgroundColor: NAVY }} />
-              <span className="text-[11px] text-slate-400 mt-1.5">{d.m}</span>
-            </div>
-          ))}
-        </div>
-      </SectionCard>
-      <SectionCard>
-        <h3 className="text-sm font-bold text-slate-700 mb-3">Alertas activas</h3>
-        <div className="flex items-start gap-2 bg-red-50 rounded-lg p-3">
-          <AlertTriangle size={16} color="#B5432E" />
-          <p className="text-[12px] text-slate-600">Tiempo promedio de asignación por encima de meta 2 semanas consecutivas — requiere plan de acción correctivo.</p>
-        </div>
-      </SectionCard>
-      <SectionCard className="lg:col-span-3">
-        <h3 className="text-sm font-bold text-slate-700 mb-3">Indicadores del proyecto</h3>
-        <table className="w-full text-[12px]">
-          <thead>
-            <tr className="text-left text-slate-400 border-b border-slate-200">
-              <th className="py-2 font-medium">Nivel</th>
-              <th className="py-2 font-medium">Indicador</th>
-              <th className="py-2 font-medium">Meta</th>
-              <th className="py-2 font-medium">Frecuencia</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tabla.map((r, i) => (
-              <tr key={i} className="border-b border-slate-100 last:border-0">
-                <td className="py-2 text-slate-500">{r.nivel}</td>
-                <td className="py-2 font-medium text-slate-700">{r.ind}</td>
-                <td className="py-2 text-slate-600">{r.meta}</td>
-                <td className="py-2 text-slate-500">{r.frec}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </SectionCard>
-    </div>
-  );
-}
+<section class="cards">
 
-/* ---------- 6. Vista: Proveedores ---------- */
-function ProveedoresView() {
-  const proveedores = [
-    { nombre: "Andina Suministros Industriales", cat: "Repuestos", rating: 4.5, entrega: "3 días", estado: "En revisión" },
-    { nombre: "Insumos EPP del Norte", cat: "Dotación y EPP", rating: 4.8, entrega: "2 días", estado: "Activo" },
-    { nombre: "TecnoClima Servicios", cat: "Mantenimiento HVAC", rating: 4.2, entrega: "5 días", estado: "Activo" },
-    { nombre: "Resinas y Polímeros S.A.S.", cat: "Materia prima", rating: 3.9, entrega: "7 días", estado: "En revisión" },
-  ];
-  return (
-    <SectionCard>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold text-slate-700">Base de proveedores calificados</h3>
-        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold text-white" style={{ backgroundColor: NAVY }}>
-          <Plus size={13} /> Calificar proveedor
-        </button>
-      </div>
-      <table className="w-full text-[12px]">
-        <thead>
-          <tr className="text-left text-slate-400 border-b border-slate-200">
-            <th className="py-2 font-medium">Proveedor</th>
-            <th className="py-2 font-medium">Categoría</th>
-            <th className="py-2 font-medium">Calificación</th>
-            <th className="py-2 font-medium">Tiempo de entrega</th>
-            <th className="py-2 font-medium">Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          {proveedores.map((p) => (
-            <tr key={p.nombre} className="border-b border-slate-100 last:border-0">
-              <td className="py-2.5 font-medium text-slate-700">{p.nombre}</td>
-              <td className="py-2.5 text-slate-500">{p.cat}</td>
-              <td className="py-2.5">
-                <span className="flex items-center gap-1 text-slate-600">
-                  <Star size={13} color={GOLD} /> {p.rating}
-                </span>
-              </td>
-              <td className="py-2.5 text-slate-500">{p.entrega}</td>
-              <td className="py-2.5">
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
-                      style={ p.estado === "Activo"
-                        ? { backgroundColor: "#E4EFE7", color: "#3D6B4A" }
-                        : { backgroundColor: "#FBF1DC", color: "#8A6A1E" } }>
-                  {p.estado}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </SectionCard>
-  );
-}
+<div class="card">
 
-/* ---------- 7. Vista: Administración ---------- */
-function AdministracionView() {
-  const bloques = [
-    { icon: Users, title: "Usuarios y roles", desc: "14 usuarios activos — Solicitantes, Compras, Aprobadores, Administrador" },
-    { icon: Database, title: "Catálogos", desc: "Áreas, categorías de ítems, unidades de medida y proveedores" },
-    { icon: Settings, title: "Parámetros del sistema", desc: "Reglas de clasificación, SLA por prioridad, plantillas de notificación" },
-    { icon: CheckCircle2, title: "Auditoría y trazabilidad", desc: "Historial de cambios, accesos y aprobaciones del sistema" },
-  ];
-  const usuarios = [
-    { nombre: "Juan Ramírez", rol: "Equipo de Compras", area: "Mantenimiento", estado: "Activo" },
-    { nombre: "María Torres", rol: "Equipo de Compras", area: "Comercial", estado: "Activo" },
-    { nombre: "Andrea Pardo", rol: "Aprobador", area: "Producción", estado: "Activo" },
-    { nombre: "Laura Gómez", rol: "Solicitante", area: "RRHH", estado: "Inactivo" },
-  ];
-  return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {bloques.map(({ icon: IconC, title, desc }) => (
-          <SectionCard key={title}>
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: "#F5E6E9" }}>
-              <IconC size={17} color={NAVY} />
-            </div>
-            <p className="text-[13px] font-semibold text-slate-700 mb-1">{title}</p>
-            <p className="text-[11px] text-slate-400 leading-snug">{desc}</p>
-          </SectionCard>
-        ))}
-      </div>
-      <SectionCard>
-        <h3 className="text-sm font-bold text-slate-700 mb-3">Usuarios del sistema</h3>
-        <table className="w-full text-[12px]">
-          <thead>
-            <tr className="text-left text-slate-400 border-b border-slate-200">
-              <th className="py-2 font-medium">Nombre</th>
-              <th className="py-2 font-medium">Rol</th>
-              <th className="py-2 font-medium">Área</th>
-              <th className="py-2 font-medium">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {usuarios.map((u) => (
-              <tr key={u.nombre} className="border-b border-slate-100 last:border-0">
-                <td className="py-2.5 font-medium text-slate-700">{u.nombre}</td>
-                <td className="py-2.5 text-slate-500">{u.rol}</td>
-                <td className="py-2.5 text-slate-500">{u.area}</td>
-                <td className="py-2.5">
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
-                        style={ u.estado === "Activo"
-                          ? { backgroundColor: "#E4EFE7", color: "#3D6B4A" }
-                          : { backgroundColor: "#F1F5F9", color: "#64748b" } }>
-                    {u.estado}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </SectionCard>
-    </div>
-  );
-}
+♻️
 
-const VIEWS = {
-  registro: RegistroView,
-  clasificacion: ClasificacionView,
-  tablero: TableroView,
-  notificaciones: NotificacionesView,
-  indicadores: IndicadoresView,
-  proveedores: ProveedoresView,
-  administracion: AdministracionView,
-};
+<h2>Retos Diarios</h2>
 
-function ComprasDashboardMockup() {
-  const [active, setActive] = useState("tablero");
-  const activeItem = NAV_ITEMS.find((n) => n.key === active);
-  const activeLabel = activeItem.label;
-  const ActiveView = VIEWS[active];
+<p>
 
-  return (
-    <div className="w-full min-h-screen bg-slate-50 flex text-slate-800" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
-      <aside className="w-64 shrink-0 flex flex-col" style={{ backgroundColor: NAVY }}>
-        <div className="flex items-center gap-2.5 px-5 py-5 border-b border-white/10">
-          <div className="w-9 h-9 rounded-md flex items-center justify-center font-black text-sm"
-               style={{ backgroundColor: GOLD, color: NAVY }}>VC</div>
-          <div>
-            <p className="text-white text-sm font-bold leading-none tracking-wide">Vive Claro</p>
-            <p className="text-[11px] text-white/50 leading-none mt-1">Gestión de Compras</p>
-          </div>
-        </div>
-        <nav className="flex-1 py-4">
-          {NAV_ITEMS.map(({ key, label, icon: IconC }) => {
-            const isActive = key === active;
-            return (
-              <button key={key} onClick={() => setActive(key)}
-                className="w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors"
-                style={{
-                  backgroundColor: isActive ? "rgba(255,255,255,0.08)" : "transparent",
-                  borderLeft: isActive ? `3px solid ${GOLD}` : "3px solid transparent",
-                  color: isActive ? "#FFFFFF" : "rgba(255,255,255,0.65)",
-                }}>
-                <IconC size={16} strokeWidth={2} />
-                <span className="text-[13px] font-medium">{label}</span>
-              </button>
-            );
-          })}
-        </nav>
-        <div className="px-5 py-4 border-t border-white/10">
-          <p className="text-[11px] text-white/40 leading-snug">
-            Bosquejo visual — solución de referencia, sin funcionalidad activa.
-          </p>
-        </div>
-      </aside>
+Cada día nuevos desafíos ecológicos.
 
-      <main className="flex-1 flex flex-col min-w-0">
-        <header className="flex items-center justify-between gap-4 px-6 py-4 bg-white border-b border-slate-200">
-          <div className="flex items-center gap-2 bg-slate-100 rounded-lg px-3 py-2 w-80 max-w-full">
-            <Search size={15} color="#94a3b8" />
-            <input disabled placeholder="Buscar por N° de solicitud, ítem o área..."
-              className="bg-transparent text-[13px] outline-none w-full placeholder:text-slate-400" />
-          </div>
-          <div className="flex items-center gap-4 ml-auto">
-            <button className="relative text-slate-500">
-              <Bell size={19} />
-              <span className="absolute -top-1 -right-1 text-[9px] font-bold text-white rounded-full w-4 h-4 flex items-center justify-center"
-                    style={{ backgroundColor: "#C9503A" }}>3</span>
-            </button>
-            <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-white"
-                    style={{ backgroundColor: NAVY }}>
-              <Plus size={15} /> Nueva Solicitud
-            </button>
-            <span className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
-                  style={{ backgroundColor: GOLD }}>AS</span>
-          </div>
-        </header>
+</p>
 
-        <div className="flex-1 overflow-auto px-6 py-5">
-          <div className="mb-5">
-            <h1 className="text-lg font-bold text-slate-800">{activeLabel}</h1>
-            <p className="text-[13px] text-slate-400">Vista de referencia — módulo del aplicativo de Gestión de Compras</p>
-          </div>
+</div>
 
-          {(active === "tablero" || active === "indicadores") && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              {KPIS.map(({ label, value, icon: IconC, note }) => (
-                <div key={label} className="bg-white rounded-xl border border-slate-200 p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-medium text-slate-400">{label}</span>
-                    <IconC size={15} color={GOLD} />
-                  </div>
-                  <p className="text-2xl font-bold" style={{ color: NAVY, fontFamily: "Georgia, serif" }}>{value}</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">{note}</p>
-                </div>
-              ))}
-            </div>
-          )}
+<div class="card">
 
-          <ActiveView />
-        </div>
-      </main>
-    </div>
-  );
-}
+🏆
 
-ReactDOM.createRoot(document.getElementById("root")).render(<ComprasDashboardMockup />);
-</script>
+<h2>Recompensas</h2>
+
+<p>
+
+Obtén medallas y sube de nivel.
+
+</p>
+
+</div>
+
+<div class="card">
+
+🌱
+
+<h2>Ayuda al planeta</h2>
+
+<p>
+
+Tus acciones generan impacto positivo.
+
+</p>
+
+</div>
+
+</section>
+
+<footer>
+
+EcoChallenge © 2026
+
+</footer>
+
+<script src="js/app.js"></script>
+
 </body>
+
 </html>
