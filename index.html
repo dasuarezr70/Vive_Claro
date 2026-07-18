@@ -1,9 +1,25 @@
-import React, { useState } from "react";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bosquejo — Gestión de Compras</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { margin: 0; }
+</style>
+</head>
+<body>
+<div id="root"></div>
 
+<script type="text/babel">
+const { useState } = React;
 
-
-const NAVY = "#1E3A5F";
-const GOLD = "#C9A24B";
+const NAVY = "#1A1A1A";
+const GOLD = "#C41E3A";
 
 /* --- Iconos SVG livianos (sin dependencias externas) --- */
 const Icon = ({ d, size = 16, color = "currentColor", strokeWidth = 2, children }) => (
@@ -434,7 +450,7 @@ function AdministracionView() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {bloques.map(({ icon: IconC, title, desc }) => (
           <SectionCard key={title}>
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: "#EAF1F6" }}>
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: "#F5E6E9" }}>
               <IconC size={17} color={NAVY} />
             </div>
             <p className="text-[13px] font-semibold text-slate-700 mb-1">{title}</p>
@@ -577,6 +593,7 @@ function ComprasDashboardMockup() {
   );
 }
 
-
-
-export default ComprasDashboardMockup;
+ReactDOM.createRoot(document.getElementById("root")).render(<ComprasDashboardMockup />);
+</script>
+</body>
+</html>
